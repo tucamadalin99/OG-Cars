@@ -6,20 +6,37 @@
       :todos="todos"
       :meta="meta"
     ></example-component> -->
-    <car-card>
+    <car-card
+      v-if="carResponse.length > 0"
+      :make="carResponse[0].data.type"
+      :model="model"
+    >
     </car-card>
   </q-page>
 </template>
 
 <script lang="ts">
 //import { Todo, Meta } from 'components/models';
-import { defineComponent } from 'vue';
-import CarCard from '../components/CarCard.vue'
+import { defineComponent, onMounted, ref } from 'vue';
+import CarCard from '../components/CarCard.vue';
+import Axios from 'axios';
+import { Car } from '../components/models';
 
 export default defineComponent({
   name: 'PageIndex',
   components: { CarCard },
   setup() {
+    //const random = 'string';
+    const allCarsURL = 'http://localhost:8081/api/cars/getAllCars';
+    let carResponse = ref([] as Car[]);
+    let make = 'kia hardcoded';
+    let model = 'model hardcoded';
+    onMounted(async () => {
+      carResponse.value = (
+        await Axios.get(allCarsURL, { withCredentials: false })
+      ).data as Car[];
+      console.log(carResponse.value);
+    });
     // const todos = ref<Todo[]>([
     //   {
     //     id: 1,
@@ -45,7 +62,7 @@ export default defineComponent({
     // const meta = ref<Meta>({
     //   totalCount: 1200
     // });
-    // return { todos, meta };
-  }
+    return { carResponse, make, model, onMounted };
+  },
 });
 </script>

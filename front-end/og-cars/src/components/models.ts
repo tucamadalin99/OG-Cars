@@ -14,9 +14,12 @@ export interface Review{
 }
 
 export interface Car{
-  make: string,
-  model: string,
-  type: string,
-  fuel: string,
-  reviews: Review[]
+  id: string,
+  data: {
+    make: string,
+    model: string,
+    type: string,
+    fuel: string,
+    reviews: Review[]
+  }
 }

@@ -1,8 +1,8 @@
-<template>
+<template v-if="isLoaded">
   <div class="q-pa-md row items-start q-gutter-md">
     <q-card class="cmp-car">
       <q-card-section>
-        <div class="text-h6 q-mb-xs">Car 1</div>
+        <div class="text-h6 q-mb-xs">{{ make }} {{ model }}</div>
         <div class="row no-wrap items-center">
           <q-rating size="18px" v-model="stars" :max="5" color="primary" />
           <span class="text-caption text-grey q-ml-sm">4.2 (551)</span>
@@ -59,10 +59,11 @@
 // } from 'vue';
 //import { Car, Review } from './models';
 import { ref, defineComponent } from 'vue';
-
 export default defineComponent({
   name: 'CarCard',
-  setup() {
+  props: ['make', 'model'],
+  setup(props) {
+    console.log('props', props);
     return {
       stars: ref(4),
     };
