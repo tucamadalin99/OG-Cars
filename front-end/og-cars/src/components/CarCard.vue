@@ -1,8 +1,10 @@
-<template v-if="isLoaded">
-  <div class="q-pa-md row items-start q-gutter-md">
-    <q-card class="cmp-car">
+<template>
+  <div class="q-pa-md row items-start q-gutter-md cmp-car">
+    <q-card class="cmp-car__element">
       <q-card-section>
-        <div class="text-h6 q-mb-xs">{{ make }} {{ model }}</div>
+        <div class="text-h6 q-mb-xs">
+          {{ car.data.make }} {{ car.data.model }}
+        </div>
         <div class="row no-wrap items-center">
           <q-rating size="18px" v-model="stars" :max="5" color="primary" />
           <span class="text-caption text-grey q-ml-sm">4.2 (551)</span>
@@ -11,7 +13,7 @@
       <img src="https://cdn.quasar.dev/img/parallax2.jpg" />
 
       <q-list>
-        <q-item clickable>
+        <q-item clickable @click="handleEdit">
           <q-item-section avatar>
             <q-icon color="primary" name="edit_note" />
           </q-item-section>
@@ -59,14 +61,20 @@
 // } from 'vue';
 //import { Car, Review } from './models';
 import { ref, defineComponent } from 'vue';
+import { Car } from './models';
 export default defineComponent({
   name: 'CarCard',
-  props: ['make', 'model'],
+  props: ['car'],
   setup(props) {
-    console.log('props', props);
     return {
+      carObj: ref(props.car as Car),
       stars: ref(4),
     };
+  },
+  methods: {
+    handleEdit() {
+      void this.$router.push(`/specs/${this.carObj.id}`);
+    },
   },
 });
 
@@ -109,3 +117,16 @@ export default defineComponent({
 //   },
 // });
 </script>
+<style lang="scss" scoped>
+.cmp-car {
+  width: 30%;
+
+  @media (max-width: 768px) {
+    width: 50%;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+}
+</style>

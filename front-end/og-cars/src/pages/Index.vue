@@ -1,17 +1,9 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <!-- <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component> -->
-    <car-card
-      v-if="carResponse.length > 0"
-      :make="carResponse[0].data.type"
-      :model="model"
-    >
-    </car-card>
+  <q-page class="row items-center justify-evenly" v-if="carResponse.length > 0">
+    <q-pagination v-model="current" :max="5" input />
+    <div class="cmp-car-grid">
+      <car-card v-for="car in carResponse" :key="car.id" :car="car"> </car-card>
+    </div>
   </q-page>
 </template>
 
@@ -29,8 +21,7 @@ export default defineComponent({
     //const random = 'string';
     const allCarsURL = 'http://localhost:8081/api/cars/getAllCars';
     let carResponse = ref([] as Car[]);
-    let make = 'kia hardcoded';
-    let model = 'model hardcoded';
+    let current = ref(1);
     onMounted(async () => {
       carResponse.value = (
         await Axios.get(allCarsURL, { withCredentials: false })
@@ -62,7 +53,15 @@ export default defineComponent({
     // const meta = ref<Meta>({
     //   totalCount: 1200
     // });
-    return { carResponse, make, model, onMounted };
+    return { carResponse, onMounted, current };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.cmp-car-grid {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+</style>

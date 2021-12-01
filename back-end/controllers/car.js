@@ -37,6 +37,15 @@ const controller = {
         }
     },
 
+    getCar: async(req, res) => {
+        try {
+            const carSnapshot = await (await db.collection('cars').doc(req.params.car_id).get()).data();
+            res.status(200).send(carSnapshot);
+        } catch (err) {
+            res.status(500).send({ message: `Server error: ${err}` });
+        }
+    },
+
     deleteCar: async(req, res) => {
         try {
             await db.collection('cars').doc(req.params.car_id).delete();

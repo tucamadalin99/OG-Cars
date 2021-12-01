@@ -15,11 +15,13 @@ export interface Review{
 
 export interface Car{
   id: string,
-  data: {
-    make: string,
+  data: CarData
+}
+
+export interface CarData{
+   make: string,
     model: string,
     type: string,
     fuel: string,
     reviews: Review[]
-  }
 }
