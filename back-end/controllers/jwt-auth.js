@@ -32,7 +32,7 @@ const controller = {
 
     loginUser: async(req, res) => {
         const foundUser = await authService.queryByEmail(req.body.email);
-        if (foundUser) {
+        if (foundUser.email) {
             const validPassword = bcrypt.compareSync(req.body.password, foundUser.password);
             if (validPassword) {
                 const token = jwt.sign({ id: foundUser.id }, secretKey, { expiresIn: "4h" });
