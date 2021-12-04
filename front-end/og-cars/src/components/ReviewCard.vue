@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md row items-start q-gutter-md cmp-review">
+  <div class="q-pa-md row items-start cmp-review">
     <q-card bordered class="cmp-review__card">
       <q-card-section v-if="this.currentUser" class="cmp-review__card-section">
         <q-btn
@@ -7,9 +7,17 @@
           round
           color="primary"
           icon="edit"
+          :disable="!this.isLoggedIn"
           @click="passDataToParent"
         />
-        <q-btn size="sm" round color="red-8" icon="delete_forever" />
+        <q-btn
+          size="sm"
+          round
+          color="red-8"
+          icon="delete_forever"
+          :disable="!this.isLoggedIn"
+          @click="emitDeleteEvent"
+        />
       </q-card-section>
       <q-card-section class="q-pt-md">
         {{ review.data.message }}
@@ -18,7 +26,13 @@
       <q-separator inset />
 
       <q-card-section>
-        <q-rating size="18px" v-model="stars" :max="5" color="primary" />
+        <q-rating
+          readonly
+          size="18px"
+          v-model="stars"
+          :max="5"
+          color="primary"
+        />
         <span class="text-caption text-grey q-ml-sm">{{
           review.data.rating
         }}</span>
@@ -30,11 +44,14 @@
 <script lang="ts">
 import { ref, defineComponent, Events } from 'vue';
 import { Review } from './models';
+import Utils from './utils';
 export default defineComponent({
   name: 'ReviewCard',
   props: ['review'],
-  emits: ['passDataToParent'],
+  emits: ['passDataToParent', 'emitDeleteEvent'],
   setup(props, { emit }) {
+    const token = Utils.getExpiringLocalStorage('jwt-auth');
+    let isLoggedIn = ref(token ? true : false);
     let currentUser = ref(
       localStorage.getItem('uid') == props.review.data.userId
     );
@@ -45,11 +62,18 @@ export default defineComponent({
         rating: props.review.data.rating,
       });
     };
+    const emitDeleteEvent = function () {
+      emit('emitDeleteEvent', {
+        id: props.review.id,
+      });
+    };
     return {
       review: ref(props.review as Review),
       stars: ref(props.review.data.rating),
       currentUser,
       passDataToParent,
+      emitDeleteEvent,
+      isLoggedIn,
     };
   },
 });

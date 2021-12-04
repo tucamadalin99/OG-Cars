@@ -1,3 +1,4 @@
+const { firestore } = require('firebase-admin');
 const db = require('../config/db');
 
 const queryByEmail = async(email) => {
@@ -16,4 +17,16 @@ const queryByEmail = async(email) => {
     return foundUser;
 };
 
-module.exports = { queryByEmail };
+const queryById = async(uid) => {
+    const foundUser = db.collection("users").doc(uid)
+        .get().then(snapshot => {
+            let user = snapshot.data();
+            return user;
+        }).catch((err) => {
+            console.log("Error occured: " + err);
+        });
+
+    return foundUser;
+};
+
+module.exports = { queryByEmail, queryById };

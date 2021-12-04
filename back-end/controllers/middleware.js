@@ -17,7 +17,6 @@ const tokenGuard = (req, res, next) => {
                 res.status(403).send({ message: `Forbidden: ${err}` });
             }
         } else {
-            console.log("DECODED", decoded);
             req.user = decoded;
             next();
         }

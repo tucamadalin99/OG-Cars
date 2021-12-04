@@ -2,6 +2,7 @@ const faker = require('faker');
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const reviewService = require('../services/review');
+const userService = require('../services/authUsers');
 
 const controller = {
     generateFakeUserData: async(req, res) => {
@@ -25,7 +26,6 @@ const controller = {
     addReview: async(req, res) => {
         try {
             const foundReview = await reviewService.queryReviewByUserId(req.params.car_id, req.user.id);
-            console.log(foundReview);
             if (Object.keys(foundReview).length > 0) {
                 return res.status(403).send({ message: "You already added a review to this car" });
             }
@@ -79,6 +79,30 @@ const controller = {
             } catch (err) {
                 res.status(500).send({ message: `Server error: ${err}` });
             }
+        }
+    },
+
+    getCurrentUser: async(req, res) => {
+        try {
+            const currentUser = await userService.queryById(req.params.uid);
+            if (currentUser) {
+                res.status(200).send(currentUser);
+            } else {
+                res.status(404).send({ message: "User not found" });
+            }
+        } catch (err) {
+            res.status(500).send({ message: `Server error: ${err}` });
+        }
+    },
+
+    updateUser: async(req, res) => {
+        try {
+            db.collection("users").doc(req.params.uid).get().then(async snapshot => {
+                await snapshot.ref.update({ firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email });
+                res.status(200).send({ message: "User data updated" });
+            }).catch((err) => res.status(500).send({ message: `Server error: ${err}` }));
+        } catch (err) {
+            res.status(500).send({ message: `Server error: ${err}` });
         }
     }
 };

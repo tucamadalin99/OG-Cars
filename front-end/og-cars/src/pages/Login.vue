@@ -80,8 +80,7 @@ export default {
           withCredentials: true,
         })
           .then((response: AxiosResponse) => {
-            Axios.defaults.headers.common['authorization'] = response.data
-              .token as string;
+            Utils.setDefaultHeader(response.data.token as string);
             Utils.setExpiringLocalStorage(
               'jwt-auth',
               response.data.token,

@@ -22,7 +22,7 @@ export interface CarData{
     model: string,
     type: string,
     fuel: string,
-    reviews?: Review[]
+    reviews?: []
 }
 
 export interface ReviewData{

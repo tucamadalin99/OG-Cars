@@ -10,8 +10,7 @@ const authService = require('../services/authUsers');
 const controller = {
     registerUser: async(req, res) => {
         const foundUser = await authService.queryByEmail(req.body.email);
-
-        if (foundUser) {
+        if (foundUser.email) {
             res.status(409).send({ message: "User already registered" });
         } else {
             try {

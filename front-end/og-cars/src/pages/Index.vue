@@ -1,6 +1,5 @@
 <template>
   <q-page class="row items-center justify-evenly" v-if="carResponse.length > 0">
-    <q-pagination v-model="current" :max="5" input />
     <div class="cmp-car-grid">
       <car-card v-for="car in carResponse" :key="car.id" :car="car"> </car-card>
     </div>
@@ -24,7 +23,6 @@ export default defineComponent({
       carResponse.value = (
         await Axios.get(Utils.URLs.car.getAll, { withCredentials: false })
       ).data as Car[];
-      console.log(carResponse.value);
     });
     return { carResponse, onMounted, current };
   },

@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import Axios from 'axios';
 export default class Utils{
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static setExpiringLocalStorage(key: string, value: any, ttl: number): void {
         const now = new Date();
         const item = {
@@ -21,16 +19,16 @@ export default class Utils{
         const item = JSON.parse(itemStr);
         const now = new Date();
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (now.getTime() > item.expiry) {
             localStorage.removeItem(key);
             return null;
         }
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const finalItem = item.value;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return finalItem;
+    }
+
+    static setDefaultHeader(value:string){
+        Axios.defaults.headers.common['authorization'] = value;
     }
 
     static URLs = {
@@ -42,7 +40,9 @@ export default class Utils{
             generateUsers: (amount: number) => `http://localhost:8081/api/users/generateUsers/${amount}`,
             addReview: (carId: string) => `http://localhost:8081/api/users/addReview/${carId}`,
             deleteReview: (carId: string) => `http://localhost:8081/api/users/deleteReview/${carId}`,
-            editReview: (carId: string) => `http://localhost:8081/api/users/editReview/${carId}`
+            editReview: (carId: string) => `http://localhost:8081/api/users/editReview/${carId}`,
+            getUser: (uid: string) => `http://localhost:8081/api/users/getCurrentUser/${uid}`,
+            updateUser:(uid: string) => `http://localhost:8081/api/users/updateUser/${uid}`
         },
         car: {
             getAll: 'http://localhost:8081/api/cars/getAllCars',

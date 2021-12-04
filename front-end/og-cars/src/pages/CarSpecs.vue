@@ -83,7 +83,6 @@ import Utils from '../components/utils';
 export default defineComponent({
   name: 'CarSpecs',
   setup() {
-    console.log('SETUP');
     const route = useRoute();
     const params = computed(() => route.params);
     const paramsString = params.value.car_id.toString();
@@ -94,7 +93,6 @@ export default defineComponent({
     let fuel = ref('');
     let isLoggedIn = Utils.getExpiringLocalStorage('jwt-auth') ? true : false;
 
-    console.log('SETUP', isLoggedIn);
     let carResults;
     onMounted(async () => {
       carResults = (
@@ -102,7 +100,6 @@ export default defineComponent({
           withCredentials: false,
         })
       ).data as CarData;
-      console.log(carResults.make, 'data');
       make.value = carResults.make;
       model.value = carResults.model;
       type.value = carResults.type;
@@ -124,6 +121,8 @@ export default defineComponent({
           type: type.value,
           fuel: fuel.value,
         };
+        const token = Utils.getExpiringLocalStorage('jwt-auth');
+        Utils.setDefaultHeader(token);
         void Axios.put(Utils.URLs.car.editCar(paramsString), editCarBody, {
           withCredentials: true,
         })

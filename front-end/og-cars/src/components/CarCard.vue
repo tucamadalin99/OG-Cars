@@ -6,17 +6,17 @@
           {{ car.data.make }} {{ car.data.model }}
         </div>
         <div class="row no-wrap items-center">
-          <q-rating
+          <!-- <q-rating
             readonly
             size="18px"
             v-model="stars"
             :max="5"
             color="primary"
           />
-          <span class="text-caption text-grey q-ml-sm">4.2 (551)</span>
+          <span class="text-caption text-grey q-ml-sm">4.2 (551)</span> -->
         </div>
       </q-card-section>
-      <img src="https://cdn.quasar.dev/img/parallax2.jpg" />
+      <img class="q-pa-md" src="../../public/car-placeholder.png" />
 
       <q-list>
         <q-item clickable @click="handleEdit">
@@ -41,7 +41,7 @@
           </q-item-section>
         </q-item>
 
-        <q-item clickable>
+        <q-item clickable :disable="!this.isLoggedIn" @click="confirm">
           <q-item-section avatar>
             <q-icon color="red" name="delete_forever" />
           </q-item-section>
@@ -57,24 +57,52 @@
 </template>
 
 <script lang="ts">
-// import {
-//   defineComponent,
-//   PropType,
-//   computed,
-//   ref,
-//   toRef,
-//   Ref,
-// } from 'vue';
-//import { Car, Review } from './models';
 import { ref, defineComponent } from 'vue';
 import { Car } from './models';
+import Utils from './utils';
+import Axios from 'axios';
+import { useQuasar } from 'quasar';
 export default defineComponent({
   name: 'CarCard',
   props: ['car'],
   setup(props) {
+    const token = Utils.getExpiringLocalStorage('jwt-auth');
+    let isLoggedIn = ref(token ? true : false);
+    const $q = useQuasar();
+    function confirm() {
+      $q.dialog({
+        title: 'Confirm',
+        message: 'This will delete the car from the database',
+        cancel: true,
+        persistent: true,
+      }).onOk(() => {
+        Utils.setDefaultHeader(Utils.getExpiringLocalStorage('jwt-auth'));
+        Axios.delete(Utils.URLs.car.deleteCar(props.car.id), {
+          withCredentials: true,
+        })
+          .then((response) => {
+            $q.notify({
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: response.data.message,
+            });
+          })
+          .catch((err) => {
+            $q.notify({
+              color: 'red-8',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: err.response?.data.message,
+            });
+          });
+      });
+    }
+
     return {
       carObj: ref(props.car as Car),
-      stars: ref(4),
+      isLoggedIn,
+      confirm,
     };
   },
   methods: {
@@ -86,45 +114,6 @@ export default defineComponent({
     },
   },
 });
-
-// function useClickCount() {
-//   const clickCount = ref(0);
-//   function increment() {
-//     clickCount.value += 1
-//     return clickCount.value;
-//   }
-
-//   return { clickCount, increment };
-// }
-
-// function useDisplayTodo(todos: Ref<Todo[]>) {
-//   const todoCount = computed(() => todos.value.length);
-//   return { todoCount };
-// }
-
-// export default defineComponent({
-//   name: 'CompositionComponent',
-//   props: {
-//     title: {
-//       type: String,
-//       required: true
-//     },
-//     todos: {
-//       type: Array as PropType<Todo[]>,
-//       default: () => []
-//     },
-//     meta: {
-//       type: Object as PropType<Meta>,
-//       required: true
-//     },
-//     active: {
-//       type: Boolean
-//     }
-//   },
-//   setup(props) {
-//     return { ...useClickCount(), ...useDisplayTodo(toRef(props, 'todos')) };
-//   },
-// });
 </script>
 <style lang="scss" scoped>
 .cmp-car {
