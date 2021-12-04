@@ -16,7 +16,7 @@ module.exports = configure(function(ctx) {
         supportTS: {
             tsCheckerConfig: {
                 eslint: {
-                    enabled: true,
+                    enabled: false,
                     files: './src/**/*.{ts,tsx,js,jsx,vue}',
                 },
             }
@@ -77,6 +77,14 @@ module.exports = configure(function(ctx) {
             chainWebpack( /* chain */ ) {
                 //
             },
+            extendWebpack(cfg) {
+                cfg.module.rules.push({
+                    enforce: 'pre',
+                    test: /\.(js|vue)$/,
+                    loader: 'eslint-loader',
+                    exclude: /(node_modules|quasar)/
+                });
+            }
         },
 
         // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
@@ -101,7 +109,7 @@ module.exports = configure(function(ctx) {
             // directives: [],
 
             // Quasar plugins
-            plugins: ['Notify']
+            plugins: ['Notify', 'Dialog']
         },
 
         // animations: 'all', // --- includes all animations

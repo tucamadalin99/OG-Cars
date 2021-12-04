@@ -8,9 +8,8 @@ export interface Meta {
 }
 
 export interface Review{
-  userId: string,
-  message: string,
-  rating: number
+  id: string,
+  data: ReviewData
 }
 
 export interface Car{
@@ -23,5 +22,11 @@ export interface CarData{
     model: string,
     type: string,
     fuel: string,
-    reviews: Review[]
+    reviews?: Review[]
+}
+
+export interface ReviewData{
+  userId: string,
+  message: string,
+  rating: number
 }

@@ -117,6 +117,7 @@ const linksList = [
 ];
 
 import { defineComponent, ref, onBeforeUpdate } from 'vue';
+import Utils from '../components/utils';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -125,10 +126,12 @@ export default defineComponent({
 
   setup() {
     const leftDrawerOpen = ref(false);
-    let loggedIn = ref(localStorage.getItem('jwt-token') ? true : false);
+    let loggedIn = ref(
+      Utils.getExpiringLocalStorage('jwt-auth') ? true : false
+    );
 
     onBeforeUpdate(() => {
-      loggedIn.value = localStorage.getItem('jwt-token') ? true : false;
+      loggedIn.value = Utils.getExpiringLocalStorage('jwt-auth') ? true : false;
     });
 
     return {

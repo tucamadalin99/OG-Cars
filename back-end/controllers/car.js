@@ -11,7 +11,6 @@ const controller = {
                     model: faker.vehicle.model(),
                     type: faker.vehicle.type(),
                     fuel: faker.vehicle.fuel(),
-                    reviews: []
                 };
                 await db.collection('cars').add(fakeCar);
             }
@@ -66,7 +65,7 @@ const controller = {
             };
             if (editedCar.make || editedCar.model || editedCar.fuel || editedCar.type || editedCar.engineCap) {
                 let finalEdit = {};
-                for (prop in editedCar) {
+                for (let prop in editedCar) {
                     if (editedCar[prop]) {
                         finalEdit[`${prop}`] = editedCar[prop];
                     }

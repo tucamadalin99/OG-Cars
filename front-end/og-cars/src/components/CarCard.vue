@@ -6,7 +6,13 @@
           {{ car.data.make }} {{ car.data.model }}
         </div>
         <div class="row no-wrap items-center">
-          <q-rating size="18px" v-model="stars" :max="5" color="primary" />
+          <q-rating
+            readonly
+            size="18px"
+            v-model="stars"
+            :max="5"
+            color="primary"
+          />
           <span class="text-caption text-grey q-ml-sm">4.2 (551)</span>
         </div>
       </q-card-section>
@@ -24,7 +30,7 @@
           </q-item-section>
         </q-item>
 
-        <q-item clickable>
+        <q-item clickable @click="handleReview">
           <q-item-section avatar>
             <q-icon color="orange" name="reviews" />
           </q-item-section>
@@ -74,6 +80,9 @@ export default defineComponent({
   methods: {
     handleEdit() {
       void this.$router.push(`/specs/${this.carObj.id}`);
+    },
+    handleReview() {
+      void this.$router.push(`/reviews/${this.carObj.id}`);
     },
   },
 });

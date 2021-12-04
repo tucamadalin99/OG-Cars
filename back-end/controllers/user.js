@@ -24,6 +24,11 @@ const controller = {
 
     addReview: async(req, res) => {
         try {
+            const foundReview = await reviewService.queryReviewByUserId(req.params.car_id, req.user.id);
+            console.log(foundReview);
+            if (Object.keys(foundReview).length > 0) {
+                return res.status(403).send({ message: "You already added a review to this car" });
+            }
             const newReview = {
                 userId: req.user.id,
                 message: req.body.message,

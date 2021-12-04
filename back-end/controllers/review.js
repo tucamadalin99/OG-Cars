@@ -18,7 +18,7 @@ const controller = {
                 };
                 await db.collection('cars').doc(faker.random.arrayElement(carIds)).collection('reviews').add(fakeReview);
             }
-            res.status(201).send({ message: "Cars Data generated!" });
+            res.status(201).send({ message: "Review Data generated!" });
         } catch (err) {
             res.status(500).send({ message: `Server error: ${err}` });
         }

@@ -1,28 +1,31 @@
 <template>
-  <div class="q-pa-md cmp-car-form">
-    <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+  <div class="q-pa-md cmp-specs">
+    <q-form @submit="onSubmit" @reset="onReset" class="q-pa-lg cmp-specs__form">
       <q-input
         filled
+        :disable="!this.isLoggedIn"
         v-model="make"
         label="Car name *"
         hint="Car manufacturer"
         lazy-rules
+        class="q-mb-md"
         :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       />
 
       <q-input
         filled
+        class="q-mb-md"
+        :disable="!this.isLoggedIn"
         v-model="model"
         label="Car model *"
         lazy-rules
-        :rules="[
-          (val) => (val !== null && val !== '') || 'Please type model',
-          (val) => (val > 0 && val < 100) || 'Please type a real model',
-        ]"
+        :rules="[(val) => (val !== null && val !== '') || 'Please type model']"
       />
 
       <q-input
         filled
+        class="q-mb-md"
+        :disable="!this.isLoggedIn"
         v-model="type"
         label="Car type *"
         hint="Sedan, Hatchback..."
@@ -32,27 +35,38 @@
 
       <q-input
         filled
+        class="q-mb-md"
+        :disable="!this.isLoggedIn"
         v-model="fuel"
         label="Fuel type *"
         hint="Gasoline, Diesel..."
         lazy-rules
         :rules="[
           (val) => (val !== null && val !== '') || 'Please add fuel type',
-          (val) => (val > 0 && val < 100) || 'Please type a real fuel',
         ]"
       />
 
-      <q-toggle v-model="accept" label="I accept the license and terms" />
-
-      <div>
-        <q-btn label="Submit" type="submit" color="primary" />
+      <div class="cmp-specs__form-buttons">
         <q-btn
+          label="Submit"
+          type="submit"
+          color="primary"
+          :disable="!this.isLoggedIn"
+        />
+        <q-btn
+          :disable="!this.isLoggedIn"
           label="Reset"
           type="reset"
           color="primary"
           flat
           class="q-ml-sm"
         />
+      </div>
+      <div
+        v-if="!this.isLoggedIn"
+        class="cmp-specs__form-message q-mt-md flex flex-center"
+      >
+        Not authenticated
       </div>
     </q-form>
   </div>
@@ -63,25 +77,31 @@ import { CarData } from '../components/models';
 import { defineComponent, onMounted, computed, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRoute } from 'vue-router';
-import Axios from 'axios';
+import Axios, { AxiosResponse, AxiosError } from 'axios';
+import Utils from '../components/utils';
 
 export default defineComponent({
   name: 'CarSpecs',
   setup() {
+    console.log('SETUP');
     const route = useRoute();
     const params = computed(() => route.params);
     const paramsString = params.value.car_id.toString();
-    const getCarURL = 'http://localhost:8081/api/cars/getCar/' + paramsString;
     const $q = useQuasar();
     let make = ref('');
     let model = ref('');
     let type = ref('');
     let fuel = ref('');
-    let accept = ref(false);
+    let isLoggedIn = Utils.getExpiringLocalStorage('jwt-auth') ? true : false;
+
+    console.log('SETUP', isLoggedIn);
     let carResults;
     onMounted(async () => {
-      carResults = (await Axios.get(getCarURL, { withCredentials: false }))
-        .data as CarData;
+      carResults = (
+        await Axios.get(Utils.URLs.car.getCar(paramsString), {
+          withCredentials: false,
+        })
+      ).data as CarData;
       console.log(carResults.make, 'data');
       make.value = carResults.make;
       model.value = carResults.model;
@@ -96,22 +116,33 @@ export default defineComponent({
       make,
       type,
       fuel,
+      isLoggedIn,
       onSubmit() {
-        if (accept.value !== true) {
-          $q.notify({
-            color: 'red-5',
-            textColor: 'white',
-            icon: 'warning',
-            message: 'You need to accept the license and terms first',
+        const editCarBody: CarData = {
+          make: make.value,
+          model: model.value,
+          type: type.value,
+          fuel: fuel.value,
+        };
+        void Axios.put(Utils.URLs.car.editCar(paramsString), editCarBody, {
+          withCredentials: true,
+        })
+          .then((response: AxiosResponse) => {
+            $q.notify({
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: response.data.message,
+            });
+          })
+          .catch((err: AxiosError) => {
+            $q.notify({
+              color: 'red-8',
+              textColor: 'white',
+              icon: 'error',
+              message: err.response?.data.message,
+            });
           });
-        } else {
-          $q.notify({
-            color: 'green-4',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: 'Submitted',
-          });
-        }
       },
       onReset() {
         make.value = '';
@@ -125,9 +156,24 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.cmp-car-form {
+.cmp-specs {
   display: flex;
   justify-content: center;
   align-content: center;
+
+  &__form {
+    width: 80%;
+    @media (min-width: 1368px) {
+      width: 25%;
+      padding: 24px;
+      margin-top: 18px;
+      box-shadow: 0px 0px 18px 1px #d4d4d4;
+      border-radius: 6px;
+    }
+    &-buttons {
+      display: flex;
+      justify-content: center;
+    }
+  }
 }
 </style>

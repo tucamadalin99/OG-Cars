@@ -61,6 +61,7 @@ import { ref } from 'vue';
 import Axios from 'axios';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'vue-router';
+import Utils from '../components/utils';
 
 export default {
   setup() {
@@ -79,15 +80,15 @@ export default {
           withCredentials: true,
         })
           .then((response: AxiosResponse) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            Axios.defaults.headers['authorization'] = response.data
+            Axios.defaults.headers.common['authorization'] = response.data
               .token as string;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            localStorage.setItem(
-              'jwt-token',
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-              JSON.stringify(response.data.token)
+            Utils.setExpiringLocalStorage(
+              'jwt-auth',
+              response.data.token,
+              4 * 3600 * 1000
             );
+
+            localStorage.setItem('uid', response.data.userId);
 
             $q.notify({
               color: 'green-8',
@@ -103,7 +104,6 @@ export default {
               color: 'red-8',
               textColor: 'white',
               icon: 'error',
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               message: err?.response?.data.message as string,
             });
           });
@@ -123,7 +123,7 @@ export default {
   display: flex;
   justify-content: center;
   &__container {
-    width: 40%;
+    width: 30vw;
     padding: 48px;
     box-shadow: 0px 0px 18px 1px #d4d4d4;
     border-radius: 6px;
@@ -150,7 +150,7 @@ export default {
     color: #111111;
   }
   &__container &__container-form > .q-input {
-    width: 80%;
+    width: 100%;
     @media (max-width: 767px) {
       width: 100%;
     }
