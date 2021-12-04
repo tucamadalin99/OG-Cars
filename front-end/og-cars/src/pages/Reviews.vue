@@ -311,6 +311,11 @@ h5 {
     display: flex;
     gap: 12px;
   }
+  &__grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
   &__actions {
     margin: 24px;
     justify-content: space-between;

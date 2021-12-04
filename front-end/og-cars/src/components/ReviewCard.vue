@@ -80,7 +80,13 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .cmp-review {
-  width: 100%;
+  width: 65%;
+  @media (max-width: 1023px) {
+    width: 80%;
+  }
+  @media (max-width: 767px) {
+    width: 100%;
+  }
   &__card {
     width: 100%;
   }
